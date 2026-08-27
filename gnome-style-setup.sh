@@ -141,6 +141,14 @@ fi
 cd "$HOME"
 gnome-extensions enable ding@rastersoft.com || true
 
+log "Configurando os ícones da área de trabalho (DING)"
+gsettings set org.gnome.shell.extensions.ding icon-size 'small'
+gsettings set org.gnome.shell.extensions.ding arrangeorder 'NAME'
+gsettings set org.gnome.shell.extensions.ding start-corner 'top-left'
+gsettings set org.gnome.shell.extensions.ding show-trash false
+gsettings set org.gnome.shell.extensions.ding show-home true
+gsettings set org.gnome.shell.extensions.ding show-volumes true
+
 # -----------------------------------------------------------------------------
 # 3. Fonte estilo macOS (Inter é a alternativa livre mais próxima da San Francisco)
 # -----------------------------------------------------------------------------
@@ -177,15 +185,15 @@ gsettings set org.gnome.desktop.wm.preferences button-layout ':minimize,maximize
 # -----------------------------------------------------------------------------
 log "Configurando o dock"
 gsettings set org.gnome.shell.extensions.dash-to-dock dock-position 'BOTTOM'
-gsettings set org.gnome.shell.extensions.dash-to-dock dock-fixed false
+gsettings set org.gnome.shell.extensions.dash-to-dock dock-fixed true
 gsettings set org.gnome.shell.extensions.dash-to-dock autohide true
 gsettings set org.gnome.shell.extensions.dash-to-dock intellihide true
 gsettings set org.gnome.shell.extensions.dash-to-dock extend-height false
-gsettings set org.gnome.shell.extensions.dash-to-dock dash-max-icon-size 48
+gsettings set org.gnome.shell.extensions.dash-to-dock dash-max-icon-size 40
 gsettings set org.gnome.shell.extensions.dash-to-dock icon-size-fixed false
 gsettings set org.gnome.shell.extensions.dash-to-dock show-apps-at-top false
-gsettings set org.gnome.shell.extensions.dash-to-dock show-trash false
-gsettings set org.gnome.shell.extensions.dash-to-dock show-mounts false
+gsettings set org.gnome.shell.extensions.dash-to-dock show-trash true
+gsettings set org.gnome.shell.extensions.dash-to-dock show-mounts true
 gsettings set org.gnome.shell.extensions.dash-to-dock click-action 'minimize'
 gsettings set org.gnome.shell.extensions.dash-to-dock running-indicator-style 'DOTS'
 gsettings set org.gnome.shell.extensions.dash-to-dock transparency-mode 'FIXED'
