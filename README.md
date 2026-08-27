@@ -1,107 +1,132 @@
-# gnome-macos-setup.sh
- 
-Script bash para personalizar o GNOME no Fedora com um visual estilo **macOS
-minimalista**: tema escuro, ícones, cursor, dock inferior e uma barra
-superior mais limpa.
- 
+# gnome-style-setup.sh
+
+Script bash para aplicar um visual **soft** estilo macOS no GNOME do Fedora,
+com só as mudanças mais importantes: dock, ícones na área de trabalho, fonte
+e um leve blur. Sem trocar tema GTK, ícones de app ou cursor.
+
 ## O que o script faz
- 
-- Instala e aplica o tema **WhiteSur** (GTK + Shell) na variante escura
-- Instala os ícones e o cursor **WhiteSur**
-- Instala a fonte **Inter** (alternativa livre à San Francisco da Apple)
-- Configura o **Dash to Dock** como um dock inferior com auto-hide, estilo macOS
-- Move os botões da janela (fechar/minimizar/maximizar) para a **esquerda**
-- Deixa a barra superior mais minimalista com o **Just Perfection**
-  (remove o botão "Atividades", o menu do app, zera os cantos arredondados)
-- Ativa efeito de **blur** no painel e no dock com o **Blur My Shell**
+
+- Configura o **Dash to Dock** como um dock inferior com auto-hide; clicar no
+  ícone de um app aberto minimiza/restaura a janela (como no Ubuntu)
+- Instala e habilita **ícones na área de trabalho** (Desktop Icons NG - DING)
+- Instala e aplica a fonte **Inter** (alternativa livre à San Francisco da Apple)
+- Adiciona os botões de **minimizar/maximizar** na barra de título das janelas
+  (como no Ubuntu; o Fedora por padrão só mostra o botão de fechar)
+- Ativa um leve efeito de **blur** no painel e no dock com o **Blur My Shell**
+
 ## Compatibilidade
- 
+
 Testado e compatível com:
- 
+
 - **Fedora Linux 44**
 - **GNOME Shell 50.x**
-As extensões (Dash to Dock, Blur My Shell, Just Perfection, User Themes)
-são instaladas via `dnf`, usando os pacotes oficiais do repositório do
-Fedora — isso evita o erro comum de "No such schema" que acontece quando
-extensões são instaladas soltas fora do gerenciador de pacotes.
- 
-**Aviso conhecido:** existe um bug cosmético em aberto no tema WhiteSur no
-GNOME 50 (uma linha branca fina no topo do painel). É só visual e não
-afeta o funcionamento do sistema.
- 
+
+As extensões Dash to Dock e Blur My Shell são instaladas via `dnf`, usando
+os pacotes oficiais do repositório do Fedora — isso evita o erro comum de
+"No such schema" que acontece quando extensões são instaladas soltas fora
+do gerenciador de pacotes.
+
+A extensão de ícones na área de trabalho (DING) não tem pacote no Fedora,
+então o script a compila a partir do código-fonte oficial (branch master,
+com suporte a GNOME 50 desde jan/2026).
+
 ## Requisitos
- 
-- Fedora Linux com GNOME Shell (Workstation)
+
+- Fedora Linux com GNOME Shell (Workstation), numa **sessão GNOME já
+  logada** — o script confere `$XDG_CURRENT_DESKTOP` e recusa rodar fora
+  dela
 - Usuário com permissão de `sudo`
-- Conexão com a internet (o script baixa temas do GitHub e a fonte Inter)
+- Conexão com a internet (o script consulta a API do GitHub para achar o
+  release mais recente da fonte Inter, baixa a extensão DING do GitLab e
+  baixa a fonte do GitHub)
+
 ## Como usar
- 
+
 ```bash
-chmod +x gnome-macos-setup.sh
-./gnome-macos-setup.sh
+chmod +x gnome-style-setup.sh
+./gnome-style-setup.sh              # instala e aplica
+./gnome-style-setup.sh --uninstall  # desfaz as configurações aplicadas
 ```
- 
+
 Depois que o script terminar, **faça logout e login novamente** (não use
 apenas "Alt+F2 r" — esse atalho só funciona no X11, e a maioria das
 instalações atuais do Fedora roda em Wayland). O GNOME só carrega as
 extensões novas em uma sessão de shell nova.
- 
+
+> A extensão DING é instalada rodando o `local_install.sh` oficial do
+> projeto (código de terceiros, baixado do GitLab em tempo de execução,
+> com as permissões do seu usuário — nunca root). Se quiser auditar antes
+> de rodar, o script fica em `~/.cache/gnome-style-setup/desktop-icons-ng/local_install.sh`
+> depois do `git clone`.
+
 ## O que é instalado
- 
+
 | Categoria | Pacote/Fonte |
 |---|---|
-| Extensões GNOME | `gnome-shell-extension-user-theme`, `gnome-shell-extension-dash-to-dock`, `gnome-shell-extension-blur-my-shell`, `gnome-shell-extension-just-perfection` |
-| Ferramentas | `gnome-tweaks`, `gnome-extensions-app`, `dconf-editor`, `gnome-browser-connector` |
-| Tema GTK/Shell | [WhiteSur-gtk-theme](https://github.com/vinceliuice/WhiteSur-gtk-theme) |
-| Ícones | [WhiteSur-icon-theme](https://github.com/vinceliuice/WhiteSur-icon-theme) |
-| Cursor | [WhiteSur-cursors](https://github.com/vinceliuice/WhiteSur-cursors) |
+| Extensões GNOME (via dnf) | `gnome-shell-extension-dash-to-dock`, `gnome-shell-extension-blur-my-shell` |
+| Extensão GNOME (compilada) | [Desktop Icons NG (DING)](https://gitlab.com/rastersoft/desktop-icons-ng) |
+| Ferramentas | `gnome-tweaks`, `gnome-extensions-app`, `dconf-editor` |
+| Build (para a DING) | `meson`, `ninja-build`, `gettext` |
 | Fonte | [Inter](https://github.com/rsms/inter) |
- 
+
 ## Personalização
- 
+
 O script já vem com valores prontos, mas alguns pontos podem ser ajustados
 diretamente no arquivo antes de rodar:
- 
+
 - **Wallpaper**: há duas linhas comentadas no final do script — descomente
   e aponte para o caminho da sua imagem.
-- **Cor de acento do tema**: troque `-t all` por uma cor específica do
-  WhiteSur (`blue`, `purple`, `pink`, `red`, `orange`, `yellow`, `green`,
-  `grey`) no comando de instalação do GTK theme.
 - **Tamanho dos ícones do dock**: ajuste o valor de
   `dash-max-icon-size` na seção do Dash to Dock.
+- **Opções da área de trabalho** (tamanho dos ícones, mostrar/ocultar
+  volumes, lixeira etc.): abra `gnome-extensions prefs ding@rastersoft.com`
+  depois de rodar o script.
+
 ## Solução de problemas
- 
+
 - **Erro "No such schema" no gsettings**: normalmente indica que a
   extensão correspondente não foi instalada via `dnf` (por exemplo, se
   você instalou manualmente por fora do script). Reinstale via
   `sudo dnf install gnome-shell-extension-<nome>`.
 - **Extensão não aparece habilitada**: faça logout/login completo — o
   GNOME só reconhece extensões novas numa sessão de shell nova.
-- **Comando do Just Perfection falha com "No such key"**: os nomes das
-  chaves podem variar entre versões da extensão. Nesse caso, abra a
-  interface gráfica com `gnome-extensions prefs just-perfection-desktop@just-perfection`
-  e ajuste manualmente.
-- **Linha branca no topo do painel**: bug cosmético conhecido do WhiteSur
-  no GNOME 50, sem correção oficial até o momento. Não afeta o
-  funcionamento do sistema.
+- **Ícones não aparecem na área de trabalho**: confirme que a extensão foi
+  habilitada com `gnome-extensions enable ding@rastersoft.com` e faça
+  logout/login.
+- **Script recusa rodar com mensagem sobre sessão GNOME**: confirme que
+  você está numa sessão gráfica GNOME de verdade (não SSH, não TTY, não
+  outro desktop). O script checa a variável `$XDG_CURRENT_DESKTOP`.
+
 ## Desinstalar / reverter
- 
+
 ```bash
-# Remover o tema GTK/Shell WhiteSur
-cd ~/.cache/gnome-macos-theme/WhiteSur-gtk-theme && ./install.sh -r
- 
-# Remover ícones
-cd ~/.cache/gnome-macos-theme/WhiteSur-icon-theme && ./install.sh -r
- 
+./gnome-style-setup.sh --uninstall
+```
+
+Isso desabilita as extensões (Dash to Dock, Blur My Shell, DING), remove os
+arquivos da DING, e reseta fonte, botões de janela, dock e blur para o
+padrão do GNOME. Não remove os pacotes instalados via `dnf` (são só
+desabilitados/resetados, não desinstalados do sistema).
+
+Se preferir fazer isso manualmente:
+
+```bash
 # Desabilitar as extensões
 gnome-extensions disable dash-to-dock@micxgx.gmail.com
 gnome-extensions disable blur-my-shell@aunetx
-gnome-extensions disable just-perfection-desktop@just-perfection
-gnome-extensions disable user-theme@gnome-shell-extensions.gcampax.github.com
- 
-# Voltar ao tema padrão do GNOME
-gsettings reset org.gnome.desktop.interface gtk-theme
-gsettings reset org.gnome.desktop.interface icon-theme
-gsettings reset org.gnome.desktop.interface cursor-theme
+gnome-extensions disable ding@rastersoft.com
+
+# Remover a extensão de ícones da área de trabalho
+rm -rf ~/.local/share/gnome-shell/extensions/ding@rastersoft.com
+
+# Voltar à fonte e aos botões de janela padrão do GNOME
+gsettings reset org.gnome.desktop.interface font-name
+gsettings reset org.gnome.desktop.interface document-font-name
+gsettings reset org.gnome.desktop.wm.preferences titlebar-font
 gsettings reset org.gnome.desktop.wm.preferences button-layout
+
+# Voltar o dock e o blur ao padrão
+gsettings reset-recursively org.gnome.shell.extensions.dash-to-dock
+gsettings reset org.gnome.shell.extensions.blur-my-shell.panel blur
+gsettings reset org.gnome.shell.extensions.blur-my-shell.dash-to-dock blur
 ```
