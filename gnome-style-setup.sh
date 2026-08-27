@@ -166,7 +166,11 @@ if [ -z "$INTER_URL" ]; then
 fi
 curl -sL -o /tmp/inter.zip "$INTER_URL"
 unzip -qo /tmp/inter.zip -d /tmp/inter
-find /tmp/inter -iname "*.otf" -path "*Desktop*" -exec cp {} "$HOME/.local/share/fonts/" \;
+find /tmp/inter -iname "*.otf" -path "*extras/otf*" -exec cp {} "$HOME/.local/share/fonts/" \;
+if ! ls "$HOME/.local/share/fonts"/Inter-*.otf >/dev/null 2>&1; then
+  echo "Falha ao instalar a fonte Inter: nenhum .otf encontrado em $INTER_URL." >&2
+  exit 1
+fi
 fc-cache -f "$HOME/.local/share/fonts" >/dev/null
 
 log "Aplicando a fonte"
