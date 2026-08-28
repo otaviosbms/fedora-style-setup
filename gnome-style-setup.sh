@@ -92,6 +92,12 @@ case "${1:-}" in
 esac
 
 # -----------------------------------------------------------------------------
+# 0. Atualização padrão do sistema (Fedora)
+# -----------------------------------------------------------------------------
+log "Atualizando o sistema (dnf upgrade)"
+sudo dnf upgrade --refresh -y
+
+# -----------------------------------------------------------------------------
 # 1. Dependências e extensões via dnf
 # -----------------------------------------------------------------------------
 # Por que via dnf e não via extensions.gnome.org / gnome-shell-extension-installer:
@@ -185,6 +191,12 @@ log "Adicionando botões de minimizar/maximizar na barra de título"
 gsettings set org.gnome.desktop.wm.preferences button-layout ':minimize,maximize,close'
 
 # -----------------------------------------------------------------------------
+# 4.1. Desativar o "hot corner" (canto superior esquerdo abre a Activities)
+# -----------------------------------------------------------------------------
+log "Desativando o hot corner do canto superior esquerdo"
+gsettings set org.gnome.desktop.interface enable-hot-corners false
+
+# -----------------------------------------------------------------------------
 # 5. Dock estilo macOS (Dash to Dock)
 # -----------------------------------------------------------------------------
 log "Configurando o dock"
@@ -204,11 +216,27 @@ gsettings set org.gnome.shell.extensions.dash-to-dock transparency-mode 'FIXED'
 gsettings set org.gnome.shell.extensions.dash-to-dock background-opacity 0.6
 
 # -----------------------------------------------------------------------------
-# 6. Blur no painel e no dock (Blur My Shell)
+# 6. Blur no painel (Blur My Shell)
 # -----------------------------------------------------------------------------
-log "Ativando efeito de blur (painel e dock)"
+# O blur no dock foi desativado de propósito: o módulo dash-to-dock do
+# Blur My Shell disputa o mesmo fundo com o Dash to Dock (que já desenha seu
+# próprio fundo via transparency-mode/background-opacity), causando cantos
+# desencontrados e um visual quadrado/sem transparência agradável. Preferimos
+# a transparência nativa do Dash to Dock (item 5) para o dock.
+log "Ativando efeito de blur (apenas no painel)"
 gsettings set org.gnome.shell.extensions.blur-my-shell.panel blur true
-gsettings set org.gnome.shell.extensions.blur-my-shell.dash-to-dock blur true
+gsettings set org.gnome.shell.extensions.blur-my-shell.dash-to-dock blur false
+
+# -----------------------------------------------------------------------------
+# 6.1. Transparência do terminal (Ptyxis)
+# -----------------------------------------------------------------------------
+log "Deixando o terminal (Ptyxis) levemente transparente"
+if command -v ptyxis >/dev/null 2>&1; then
+  PTYXIS_PROFILE_UUID="$(gsettings get org.gnome.Ptyxis default-profile-uuid | tr -d "'")"
+  if [ -n "$PTYXIS_PROFILE_UUID" ]; then
+    gsettings set "org.gnome.Ptyxis.Profile:/org/gnome/Ptyxis/Profiles/${PTYXIS_PROFILE_UUID}/" opacity 0.85 || true
+  fi
+fi
 
 # -----------------------------------------------------------------------------
 # 7. Wallpaper (opcional) — descomente e ajuste o caminho se quiser definir já
