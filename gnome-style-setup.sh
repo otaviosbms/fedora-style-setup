@@ -4,12 +4,16 @@
 #
 # Aplica só as mudanças mais importantes de um visual estilo macOS no GNOME
 # do Fedora, sem mexer em tema GTK, ícones de app ou cursor:
+#   - Atualização do sistema (dnf upgrade)
 #   - Dock inferior com auto-hide (Dash to Dock), com clique no ícone do app
 #     minimizando/restaurando a janela (como no Ubuntu)
 #   - Ícones na área de trabalho (Desktop Icons NG - DING)
 #   - Fonte "Inter" (alternativa livre à San Francisco)
 #   - Botões de minimizar/maximizar na barra de título (como no Ubuntu)
-#   - Blur no painel e no dock (Blur My Shell)
+#   - Desativação do hot corner (canto superior esquerdo abrindo Activities)
+#   - Blur no painel (Blur My Shell); o dock usa só a transparência nativa
+#     do Dash to Dock, sem blur (ver comentário na seção 6 do porquê)
+#   - Terminal (Ptyxis) com leve transparência nativa
 #
 # Uso:
 #   chmod +x gnome-style-setup.sh
@@ -71,10 +75,21 @@ uninstall() {
   gsettings reset org.gnome.desktop.wm.preferences titlebar-font
   gsettings reset org.gnome.desktop.wm.preferences button-layout
 
+  log "Restaurando o hot corner"
+  gsettings reset org.gnome.desktop.interface enable-hot-corners
+
   log "Restaurando configurações do dock e do blur"
   gsettings reset-recursively org.gnome.shell.extensions.dash-to-dock || true
   gsettings reset org.gnome.shell.extensions.blur-my-shell.panel blur || true
   gsettings reset org.gnome.shell.extensions.blur-my-shell.dash-to-dock blur || true
+
+  log "Restaurando a transparência do terminal (Ptyxis)"
+  if command -v ptyxis >/dev/null 2>&1; then
+    PTYXIS_PROFILE_UUID="$(gsettings get org.gnome.Ptyxis default-profile-uuid | tr -d "'")"
+    if [ -n "$PTYXIS_PROFILE_UUID" ]; then
+      gsettings reset "org.gnome.Ptyxis.Profile:/org/gnome/Ptyxis/Profiles/${PTYXIS_PROFILE_UUID}/" opacity || true
+    fi
+  fi
 
   log "Concluído! Faça LOGOUT/LOGIN para tudo voltar ao padrão."
 }

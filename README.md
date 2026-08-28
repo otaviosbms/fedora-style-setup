@@ -6,13 +6,21 @@ e um leve blur. Sem trocar tema GTK, ícones de app ou cursor.
 
 ## O que o script faz
 
+- Atualiza o sistema (`dnf upgrade --refresh`)
 - Configura o **Dash to Dock** como um dock inferior com auto-hide; clicar no
   ícone de um app aberto minimiza/restaura a janela (como no Ubuntu)
 - Instala e habilita **ícones na área de trabalho** (Desktop Icons NG - DING)
 - Instala e aplica a fonte **Inter** (alternativa livre à San Francisco da Apple)
 - Adiciona os botões de **minimizar/maximizar** na barra de título das janelas
   (como no Ubuntu; o Fedora por padrão só mostra o botão de fechar)
-- Ativa um leve efeito de **blur** no painel e no dock com o **Blur My Shell**
+- Desativa o **hot corner** (mover o cursor pro canto superior esquerdo não
+  abre mais a lista de apps/Activities)
+- Ativa um leve efeito de **blur no painel** com o **Blur My Shell**. O dock
+  fica só com a transparência nativa do Dash to Dock (sem blur) — os dois
+  módulos brigam pelo mesmo fundo quando ativados juntos, causando cantos
+  desencontrados e um visual quadrado
+- Deixa o terminal **Ptyxis** (padrão do Fedora/GNOME) com uma leve
+  transparência nativa (opacidade 85%)
 
 ## Compatibilidade
 
@@ -104,9 +112,10 @@ diretamente no arquivo antes de rodar:
 ```
 
 Isso desabilita as extensões (Dash to Dock, Blur My Shell, DING), remove os
-arquivos da DING, e reseta fonte, botões de janela, dock e blur para o
-padrão do GNOME. Não remove os pacotes instalados via `dnf` (são só
-desabilitados/resetados, não desinstalados do sistema).
+arquivos da DING, e reseta fonte, botões de janela, hot corner, dock, blur e
+a transparência do terminal para o padrão do GNOME. Não remove os pacotes
+instalados via `dnf` (são só desabilitados/resetados, não desinstalados do
+sistema). Também não reverte a atualização do sistema (`dnf upgrade`).
 
 Se preferir fazer isso manualmente:
 
@@ -125,8 +134,15 @@ gsettings reset org.gnome.desktop.interface document-font-name
 gsettings reset org.gnome.desktop.wm.preferences titlebar-font
 gsettings reset org.gnome.desktop.wm.preferences button-layout
 
+# Voltar o hot corner ao padrão
+gsettings reset org.gnome.desktop.interface enable-hot-corners
+
 # Voltar o dock e o blur ao padrão
 gsettings reset-recursively org.gnome.shell.extensions.dash-to-dock
 gsettings reset org.gnome.shell.extensions.blur-my-shell.panel blur
 gsettings reset org.gnome.shell.extensions.blur-my-shell.dash-to-dock blur
+
+# Voltar a transparência do terminal Ptyxis ao padrão (troque o UUID pelo
+# valor de `gsettings get org.gnome.Ptyxis default-profile-uuid`)
+gsettings reset "org.gnome.Ptyxis.Profile:/org/gnome/Ptyxis/Profiles/<uuid>/" opacity
 ```
